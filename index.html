@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی الماس و بمب</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-panel" id="loginPanel">
+        <h2>ورود به بازی</h2>
+        <input type="text" id="username" placeholder="نام کاربری">
+        <input type="password" id="password" placeholder="رمز عبور">
+        <button onclick="login()">شروع بازی</button>
+    </div>
+
+    <div class="game-container" id="gameContainer" style="display: none;">
+        <h1 id="welcomeText"></h1>
+        <div class="score">امتیاز: <span id="score">0</span> دلار</div>
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
