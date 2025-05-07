@@ -1,0 +1,40 @@
+<!-- در انتهای <body> در index.html -->
+<div id="adminPanel" style="display: none;">
+    <h2>پنل ادمین 🔒</h2>
+    <input type="password" id="adminPassword" placeholder="رمز ادمین">
+    <button onclick="enterAdmin()">ورود</button>
+    
+    <div id="adminControls" style="display: none;">
+        <h3>کنترل امتیازات</h3>
+        <input type="text" id="targetUser" placeholder="نام کاربری">
+        <input type="number" id="scoreChange" placeholder="تغییر امتیاز (+/-)">
+        <button onclick="changeScore()">اعمال تغییر</button>
+    </div>
+</div>
+
+<script>
+// نمایش پنل ادمین اگر URL شامل #admin باشد
+if (window.location.hash === "#admin") {
+    document.getElementById("adminPanel").style.display = "block";
+}
+
+function enterAdmin() {
+    const password = document.getElementById("adminPassword").value;
+    // رمز ساده (مثلاً "1234")
+    if (password === "1234") {
+        document.getElementById("adminControls").style.display = "block";
+    } else {
+        alert("رمز اشتباه!");
+    }
+}
+
+function changeScore() {
+    const username = document.getElementById("targetUser").value;
+    const change = parseInt(document.getElementById("scoreChange").value);
+    
+    // تغییر امتیاز در localStorage (یا ارسال به سرور)
+    const currentScore = parseInt(localStorage.getItem(`${username}_score`)) || 0;
+    localStorage.setItem(`${username}_score`, currentScore + change);
+    alert(`امتیاز ${username} تغییر کرد!`);
+}
+</script>
