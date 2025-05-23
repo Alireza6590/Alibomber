@@ -1,0 +1,150 @@
+import random
+import string
+
+# داده‌های کاربران
+users = {}  # کد کاربری: {'coins': سکه, 'multiplier': ضریب}
+
+def generate_code():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
+
+def menu():
+    print("=== منوی اصلی ===")
+    code = generate_code()
+    if code not in users:
+        users[code] = {'coins': 1000}
+    print(f"کد کاربری شما: {code}")
+    while True:
+        print(f"\nسکه شما: {users[code]['coins']}")
+        print("1. بازی الماس و بمب")
+        print("2. بازی انفجار (Crash)")
+        print("3. انتقال سکه")
+        print("4. پنل ادمین")
+        print("5. خروج")
+        choice = input("انتخاب کنید: ")
+        if choice == '1':
+            game1(code)
+        elif choice == '2':
+            game2(code)
+        elif choice == '3':
+            transfer_coins(code)
+        elif choice == '4':
+            admin_panel()
+        elif choice == '5':
+            print("خروج شد.")
+            break
+        else:
+            print("انتخاب نامعتبر!")
+
+def game1(code):
+    if users[code]['coins'] < 450:
+        print("سکه کافی نیست! باید حداقل 450 سکه داشته باشید.")
+        return
+    users[code]['coins'] -= 450
+    multiplier = 1.0
+    bomb_count = 3
+    bombs = set(random.sample(range(25), bomb_count))
+    revealed = set()
+
+    print("\nبازی الماس و بمب شروع شد!")
+    print("صفحه 5x5 (اعداد 0 تا 24)")
+    print("3 بمب مخفی شده‌اند. سعی کن پیداشون نکنی!")
+
+    while True:
+        print(f"سکه: {users[code]['coins']} | ضریب: {multiplier:.1f}")
+        move = input("یک عدد بین 0 تا 24 انتخاب کن (یا 'exit' برای خروج): ")
+        if move == 'exit':
+            break
+        if not move.isdigit() or not (0 <= int(move) <= 24):
+            print("عدد نامعتبر!")
+            continue
+        idx = int(move)
+        if idx in revealed:
+            print("این خانه قبلاً باز شده.")
+            continue
+        revealed.add(idx)
+        if idx in bombs:
+            print("بمب پیدا شد! باختی.")
+            break
+        else:
+            print("الماس پیدا شد! ضریب افزایش یافت.")
+            multiplier += 0.2
+
+    print(f"بازی تمام شد. ضریب نهایی: {multiplier:.1f}")
+    winnings = int(450 * multiplier)
+    users[code]['coins'] += winnings
+    print(f"سکه‌های برده شده: {winnings}")
+
+def game2(code):
+    if users[code]['coins'] < 400:
+        print("سکه کافی نیست! باید حداقل 400 سکه داشته باشید.")
+        return
+    users[code]['coins'] -= 400
+    multiplier = 1.0
+    stop_point = round(random.uniform(1.5, 5.0), 2)
+    running = True
+
+    print("\nبازی انفجار شروع شد!")
+    print(f"هدف: ضریب تا {stop_point} افزایش یابد و قبل از آن دریافت کنی.")
+
+    while running:
+        print(f"ضریب فعلی: {multiplier:.2f}")
+        action = input("برای دریافت 'collect' را تایپ کن یا 'wait' ادامه بده: ").strip().lower()
+        if action == 'collect':
+            winnings = int(400 * multiplier)
+            users[code]['coins'] += winnings
+            print(f"بردی! {winnings} سکه به حساب شما اضافه شد.")
+            running = False
+        else:
+            increment = round(random.uniform(0.1, 0.5), 2)
+            multiplier += increment
+            if multiplier >= stop_point:
+                print("انفجار رخ داد! باختی.")
+                running = False
+
+def transfer_coins(sender_code):
+    receiver_code = input("کد گیرنده را وارد کنید: ").strip()
+    if receiver_code not in users:
+        print("کد گیرنده یافت نشد.")
+        return
+    amount_str = input("مقدار سکه برای انتقال: ").strip()
+    if not amount_str.isdigit():
+        print("مقدار نامعتبر است.")
+        return
+    amount = int(amount_str)
+    if users[sender_code]['coins'] < amount:
+        print("سکه کافی ندارید.")
+        return
+    users[sender_code]['coins'] -= amount
+    users[receiver_code]['coins'] += amount
+    print("انتقال با موفقیت انجام شد.")
+
+def admin_panel():
+    password = input("رمز ادمین را وارد کنید: ")
+    if password != "admin123":
+        print("رمز اشتباه است!")
+        return
+    print("=== پنل ادمین ===")
+    print("1. افزایش سکه همه کاربران")
+    print("2. مشاهده کاربران و سکه‌ها")
+    print("3. خروج از پنل ادمین")
+    choice = input("انتخاب کنید: ")
+    if choice == '1':
+        amount_str = input("مقدار سکه برای اضافه کردن به همه: ").strip()
+        if not amount_str.isdigit():
+            print("مقدار نامعتبر است.")
+            return
+        amount = int(amount_str)
+        for user in users.values():
+            user['coins'] += amount
+        print(f"به همه کاربران {amount} سکه اضافه شد.")
+    elif choice == '2':
+        print("لیست کاربران:")
+        for code, info in users.items():
+            print(f"کد: {code} | سکه: {info['coins']}")
+    elif choice == '3':
+        print("خروج از پنل ادمین.")
+    else:
+        print("انتخاب نامعتبر!")
+
+if __name__ == '__main__':
+    menu()
